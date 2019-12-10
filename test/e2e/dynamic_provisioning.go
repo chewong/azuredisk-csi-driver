@@ -203,7 +203,7 @@ func (t *dynamicProvisioningTestSuite) defineTests(isMultiZone bool) {
 				}, isMultiZone),
 			},
 		}
-		test := testsuites.DynamicallyProvisionedCollocatedPodTest{
+		test := testsuites.DynamicallyProvisionedCmdVolumeTest{
 			CSIDriver:    testDriver,
 			Pods:         pods,
 			ColocatePods: true,

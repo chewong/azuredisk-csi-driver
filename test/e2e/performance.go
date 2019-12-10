@@ -54,7 +54,7 @@ var _ = ginkgo.Describe("[azuredisk-csi-e2e] Performance", func() {
 	})
 
 	ginkgo.FIt(fmt.Sprintf("should create 8 pods with 1 PVC each and schedule them to the same node"), func() {
-		test := testsuites.DynamicallyProvisionedCollocatedPodTest{
+		test := testsuites.DynamicallyProvisionedCmdVolumeTest{
 			CSIDriver:    testDriver,
 			Pods:         generatePods(8),
 			ColocatePods: true,

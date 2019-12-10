@@ -577,7 +577,6 @@ func (t *TestPod) SetupRawBlockVolume(pvc *v1.PersistentVolumeClaim, name, devic
 		Name:       name,
 		DevicePath: devicePath,
 	}
-	t.pod.Spec.Containers[0].VolumeDevices = make([]v1.VolumeDevice, 0)
 	t.pod.Spec.Containers[0].VolumeDevices = append(t.pod.Spec.Containers[0].VolumeDevices, volumeDevice)
 
 	volume := v1.Volume{

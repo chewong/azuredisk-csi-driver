@@ -18,7 +18,9 @@ import (
 	"sigs.k8s.io/azuredisk-csi-driver/test/e2e/driver"
 
 	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 )
 
@@ -36,7 +38,7 @@ func (t *DynamicallyProvisionedCollocatedPodTest) Run(client clientset.Interface
 	for _, pod := range t.Pods {
 		tpod, cleanup := pod.SetupWithDynamicVolumes(client, namespace, t.CSIDriver)
 		if t.ColocatePods && nodeName != "" {
-			tpod.SetNodeSelector(map[string]string{"name": nodeName})
+			tpod.SetNodeSelector(map[string]string{v1.LabelHostname: nodeName})
 		}
 		// defer must be called here for resources not get removed before using them
 		for i := range cleanup {
@@ -49,7 +51,12 @@ func (t *DynamicallyProvisionedCollocatedPodTest) Run(client clientset.Interface
 
 		ginkgo.By("checking that the pod is running")
 		tpod.WaitForRunning()
-		nodeName = tpod.pod.Spec.NodeName
+		if nodeName == "" {
+			existingPods, err := client.CoreV1().Pods(namespace.Name).List(metav1.ListOptions{})
+			gomega.Expect(err).ShouldNot(gomega.HaveOccurred())
+			// There should only be one pod before we populate nodeName
+			gomega.Expect(existingPods.Items).To(gomega.HaveLen(1))
+			nodeName = existingPods.Items[0].Spec.NodeName
+		}
 	}
-
 }

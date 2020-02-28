@@ -74,3 +74,6 @@ cscope.*
 
 # helm packaged chart
 /charts/*/*.tgz
+
+# azurediskplugin binary
+azurediskplugin

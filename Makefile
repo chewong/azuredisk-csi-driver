@@ -54,7 +54,13 @@ unit-test:
 
 .PHONY: sanity-test
 sanity-test: azuredisk
-	go test -v -timeout=30m ./test/sanity
+	cp _output/azurediskplugin test/sanity
+	docker build -t $(REGISTRY)/sanity-test-runner:$(IMAGE_VERSION) -f test/sanity/Dockerfile test/sanity
+	docker push $(REGISTRY)/sanity-test-runner:$(IMAGE_VERSION)
+	sed 's|<image>|$(REGISTRY)/sanity-test-runner:$(IMAGE_VERSION)|g' test/sanity/sanity-test-runner.yaml | kubectl apply -f -
+	kubectl wait --for=condition=Ready --timeout=1m pod/sanity-test-runner
+	kubectl logs sanity-test-runner -f
+	kubectl delete pod sanity-test-runner --grace-period=0
 
 .PHONY: integration-test
 integration-test: azuredisk
